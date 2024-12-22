@@ -1,0 +1,15 @@
+Frontend
+0. Create mapbox map, download and edit floor plan images.
+1. Finish editing images
+2. Make it possible to move images around
+3. Add all images
+4. Add bounds and styling to images 
+5. Buttons to start and stop pathing
+6. Path generation from response
+
+Backend 
+1. Generate lattice of points 
+2. Endpoint to update connections securely 
+3. Endpoint to give starting coords and destination and return a path
+
+
