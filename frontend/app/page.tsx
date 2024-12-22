@@ -7,7 +7,7 @@ const MapboxExample = () => {
   //Constants
   const images = ["_017MC_01FLR"]
   const homeCoord : [number, number] = [-80.54273214750569, 43.471054068640456]
-
+  const imageCoords :  { [key: string]: [[number, number], [number, number], [number, number], [number, number]] } = {"_017MC_01FLR" : [[-80.54380379818434,43.47267734132285],[-80.54326904638356,43.47185045491588],[-80.54405495562503,43.47155847346985],[-80.54458556318968,43.472402900479494]]}
   //Refs
   const mapContainerRef  = useRef<HTMLDivElement>(null)
   const mapRef = useRef<any>(null)
@@ -32,20 +32,26 @@ const MapboxExample = () => {
 
     //Add markers and handlers
     images.forEach((img)=>{
-      const marker = new mapboxgl.Marker({
-        draggable: true
-      })
-        .setLngLat(homeCoord)
-        .addTo(mapRef.current)
+      for(var i = 0; i < 4; i++){
+        const marker = new mapboxgl.Marker({
+          draggable: true
+        })
+          .setLngLat(imageCoords[img][i])
+          .addTo(mapRef.current)
 
-      function onDragEnd() {
-        const lngLat = marker.getLngLat()
-        console.log(lngLat)
-        mapRef.current.getSource(img).updateImage({
-          coordinates: [[lngLat.lng,lngLat.lat],[-80.54326904638356,43.47185045491588],[-80.54405495562503,43.47155847346985],[-80.54458556318968,43.472402900479494]]
-        });
+        const index = i;
+        function onDragEnd() {
+          const lngLat = marker.getLngLat()
+          const updatedCoords = imageCoords[img]
+          updatedCoords[index] = [lngLat.lng, lngLat.lat]
+          //console.log(updatedCoords)
+          mapRef.current.getSource(img).updateImage({
+            url: `/${img}.png`,
+            coordinates: updatedCoords
+          });
+        }
+        marker.on('dragend', onDragEnd)
       }
-      marker.on('dragend', onDragEnd)
     })
     
     //Add overlays
@@ -54,7 +60,7 @@ const MapboxExample = () => {
         mapRef.current.addSource(img, {
           type: 'image',
           url: `/${img}.png`,
-          coordinates: [homeCoord,[-80.54326904638356,43.47185045491588],[-80.54405495562503,43.47155847346985],[-80.54458556318968,43.472402900479494]]
+          coordinates: imageCoords[img]
         })
         mapRef.current.addLayer({
           id: `${img}-layer`,
@@ -66,6 +72,8 @@ const MapboxExample = () => {
         })
       })
     })
+
+    
 
     //Cleanup
     return () => {
